@@ -6,6 +6,7 @@ int n;
 int *fibseq;
 int i;
 int j;
+pthread_mutex_t lock;
 
 void *calc(void *arg);
 
@@ -17,9 +18,9 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 
-	if (atoi(argv[1]) < 0)
+	if (atoi(argv[1]) < 1)
 	{
-		printf("%d must be >= 0\n", atoi(argv[1]));
+		printf("input (%d) must be > 0\n", atoi(argv[1]));
 		return -1;
 	}
 
@@ -28,39 +29,40 @@ int main(int argc, char *argv[])
 	fibseq = (int *)malloc(n * sizeof(int));
 
 	pthread_t *threads = (pthread_t *)malloc(n * sizeof(pthread_t));
-//	pthread_attr_t attr;
-//	pthread_attr_init(&attr);
 
 	for(i = 0; i < n; i++)
 	{
 		pthread_create(&threads[i], NULL, calc, NULL);
 		pthread_join(threads[i], NULL);
 	}
-	printf("sequence: ");
-//	int j
+
 	for(j = 0; j < n; j++)
 	{
-		printf("%d, ", fibseq[j]);
+		printf("%d ", fibseq[j]);
 	}
+	printf("\n");
 	return 0;
 }
 
 void *calc(void *arg)
 {
-
-	if( i == 0)
+	pthread_mutex_lock(&lock);
+	if(i == 0)
 	{
 		fibseq[i] = 0;
+		pthread_mutex_unlock(&lock);
 		pthread_exit(0);
 	}
-	if(i=0)
+	if(i == 1)
 	{
-		fibseq[1] = 1;
+		fibseq[i] = 1;
+		pthread_mutex_unlock(&lock);
 		pthread_exit(0);
 	}
 	else
 	{
 		fibseq[i] = fibseq[i-1] + fibseq[i-2];
+		pthread_mutex_unlock(&lock);
 		pthread_exit(0);
 	}
 }
